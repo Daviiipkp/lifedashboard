@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: lifedashboard
+  datasource:
+    # URL mudou: agora é postgresql://localhost:porta/nome_banco
+    url: jdbc:postgresql://localhost:5432/lifedashboard_db
+    username: postgres  # Usuário padrão
+    password: password  # A senha que definimos no Docker
+    driverClassName: org.postgresql.Driver
+  jpa:
+    # O Dialeto muda para o Hibernate saber gerar o SQL certo pro Postgres
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update # Cria/Atualiza as tabelas automaticamente (Mágico!)
+    show-sql: true # Mostra o SQL no console (útil pra aprender)
