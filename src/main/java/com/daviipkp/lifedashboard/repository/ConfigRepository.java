@@ -1,16 +1,13 @@
 package com.daviipkp.lifedashboard.repository;
 
 import com.daviipkp.lifedashboard.dto.DailyData;
+import com.daviipkp.lifedashboard.dto.UserConfig;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.Optional;
 
-@Repository
-public interface DailyDataRepository extends JpaRepository<DailyData, Long> {
+public interface ConfigRepository  extends JpaRepository<UserConfig, Long> {}
 
-    Optional<DailyData> findByDate(LocalDate date);
 
-}
+

@@ -1,15 +1,20 @@
 spring:
   application:
-    name: lifedashboard
+    name: LifeDashboardBackend
+
   datasource:
-    # URL mudou: agora é postgresql://localhost:porta/nome_banco
-    url: jdbc:postgresql://localhost:5432/lifedashboard_db
-    username: postgres  # Usuário padrão
-    password: password  # A senha que definimos no Docker
-    driverClassName: org.postgresql.Driver
+    url: jdbc:h2:file:./data/database
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+
   jpa:
-    # O Dialeto muda para o Hibernate saber gerar o SQL certo pro Postgres
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: update # Cria/Atualiza as tabelas automaticamente (Mágico!)
-    show-sql: true # Mostra o SQL no console (útil pra aprender)
+      ddl-auto: update
+    show-sql: true
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
