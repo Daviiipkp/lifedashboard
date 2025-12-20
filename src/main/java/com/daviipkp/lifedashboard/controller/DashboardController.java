@@ -46,7 +46,7 @@ public class DashboardController {
         if(dto != null) {
             List<String> ss = dto.getStreaks();
             for(String s : Transforming.checkChanges(log)) {
-                //add if conditionnnnnnnnnnnnnn
+                //add if conditionnnnnnnnnnnnnnn
                     if(dto.getDate(s) == null) {
                         dto.setDate(s, LocalDate.now());
                         int num = l.get(ss.indexOf(s));
@@ -99,28 +99,15 @@ public class DashboardController {
         List<String> l = new ArrayList<>();
         List<Integer> l2 = new ArrayList<>();
         if(dto == null) {
-
-            List<LocalDate> today = new ArrayList<>();
-
-            //initializes all streak last dates with null cause there's no last date
-            for(int i = 0; i < 12; i++) {
-                today.add(null);
-            }
-            String[] keys = {
-                    "sleep", "wakeUpTime", "workedOut", "focus", "water",
-                    "reading", "studying", "meals", "detox",
-                    "planning"
-            };
-
-            for (String key : keys) {
-                l.add(key);
-                l2.add(0);
-            }
-
-            dto = new Streaks(id, l, l2, today);
+            dto = getClearStreaks(id);
             streaksRepository.save(dto);
-            dto.setStreaks(l,l2,today);
-       }
+       }else{
+            for(String s : dto.getStreaks()) {
+                if(dto.getDate(s) != LocalDate.now() && dto.getDate(s) != LocalDate.now().minusDays(1)) {
+                    dto.setStreakValue(s, 0);
+                }
+            }
+        }
         dto.addDuolingo(solvedTodayDUO);
         dto.addLeetCode(solvedTodayLC);
 

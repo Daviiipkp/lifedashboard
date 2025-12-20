@@ -75,4 +75,8 @@ public class Streaks {
         this.date.set(getStreaks().indexOf(s), date);
     }
 
+    public void setStreakValue(String s, int value) {
+        num.set(getStreaks().indexOf(s), value);
+    }
+
 }

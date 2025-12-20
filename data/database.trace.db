@@ -1,3 +1,0 @@
-2025-12-17 17:57:16.045328-03:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLDataException: Value too long for column "CONTENT CHARACTER VARYING(255)": "'rtyudbbddddbdbdbdbdbdbdbdbdbdbdbdbdbdbbyddydydydydydydydydddddddddddddddddddddd... (8176)"; SQL statement:
-update tb_planning set content=? where date=? [22001-240]

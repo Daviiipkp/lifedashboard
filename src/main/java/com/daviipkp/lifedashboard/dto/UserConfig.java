@@ -10,8 +10,7 @@ public class UserConfig {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private int id;
-
+    private Long id;
 
     float metaSleep;
     float maxWakeTime;
@@ -23,19 +22,25 @@ public class UserConfig {
     int workoutDaysGoal;
     List<Integer> workoutSpecificDays;
     boolean enableDetox;
+    boolean isDefault;
 
     public UserConfig() {}
 
-    public UserConfig(float arg0, float arg1, float arg2, int arg3, int arg4, int arg5, int arg6, List<Integer> arg7, boolean arg8) {
-        metaSleep = arg0;
-        maxWakeTime = arg1;
-        metaWater = arg2;
-        metaReading = arg3;
-        metaLeetCode = arg4;
-        metaDuolingo = arg5;
-        workoutDaysGoal = arg6;
-        workoutSpecificDays = arg7;
-        enableDetox = arg8;
+    public UserConfig(Long ID, float metaSleep, float maxWakeTime, float metaWater, int metaReading, int metaLeetCode, int metaDuolingo, int workoutDaysGoal, List<Integer> workoutSpecificDays, boolean detox, boolean isDefault) {
+        this.id = ID;
+        this.metaSleep = metaSleep;
+        this.maxWakeTime = maxWakeTime;
+        this.metaWater = metaWater;
+        this.metaReading = metaReading;
+        this.metaLeetCode = metaLeetCode;
+        this.metaDuolingo = metaDuolingo;
+        this.workoutDaysGoal = workoutDaysGoal;
+        this.workoutSpecificDays = workoutSpecificDays;
+        this.enableDetox = enableDetox;
+        this.isDefault = isDefault;
+        if(isDefault) {
+            System.out.println("DEFAULT SENT");
+        }
     }
 
     public float getMetaSleep() {
@@ -109,4 +114,15 @@ public class UserConfig {
     public void setEnableDetox(boolean enableDetox) {
         this.enableDetox = enableDetox;
     }
+
+    public boolean isDefault() {
+        return isDefault;
+    }
+
+    public Long getID() {
+        return id;
+    }
+
+    public void setID(Long id_) {id = id_;}
+
 }

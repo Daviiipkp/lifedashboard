@@ -1,13 +1,6 @@
 package com.daviipkp.lifedashboard.dto;
 
-public record UserConfigDTO (int metaSleep,
-        int maxWakeTime,
-        int metaWater,
-        int metaReading,
-        int metaLeetCode,
-        int metaDuolingo,
+import java.util.List;
 
-        int workoutDaysGoal,
-        int workoutSpecificDays,
-        boolean enableDetox){
+public record UserConfigDTO (Long ID, float metaSleep, float maxWakeTime, float metaWater, int metaReading, int metaLeetCode, int metaDuolingo, int workoutDaysGoal, List<Integer> workoutSpecificDays, boolean detox){
 }
