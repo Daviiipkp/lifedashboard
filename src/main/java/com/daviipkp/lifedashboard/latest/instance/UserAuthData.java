@@ -14,13 +14,13 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity()
-@Table(name = "userdata")
+@Table(name = "userauthdata")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class UserData implements UserDetails {
+public class UserAuthData implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -32,6 +32,9 @@ public class UserData implements UserDetails {
     private String fullname;
 
     @JsonIgnore
+    private long contentID;
+
+    @JsonIgnore
     private String password;
 
     @Enumerated(EnumType.STRING)
@@ -39,7 +42,7 @@ public class UserData implements UserDetails {
 
     private boolean enabled;
 
-    public UserData(String email, String username, String password, UserRole userRole, boolean enabled) {
+    public UserAuthData(String email, String username, String password, UserRole userRole, boolean enabled) {
         this.email = email;
         this.username = username;
         this.password = password;

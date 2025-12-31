@@ -3,10 +3,9 @@ package com.daviipkp.lifedashboard.latest.controllers;
 import com.daviipkp.lifedashboard.latest.dto.auth.AuthResponse;
 import com.daviipkp.lifedashboard.latest.dto.auth.LoginCredentials;
 import com.daviipkp.lifedashboard.latest.dto.auth.RegisterCredentials;
-import com.daviipkp.lifedashboard.latest.dto.auth.User;
 import com.daviipkp.lifedashboard.latest.instance.ResponseType;
 import com.daviipkp.lifedashboard.latest.instance.ServerResponse;
-import com.daviipkp.lifedashboard.latest.instance.UserData;
+import com.daviipkp.lifedashboard.latest.instance.UserAuthData;
 import com.daviipkp.lifedashboard.latest.instance.enums.UserRole;
 import com.daviipkp.lifedashboard.latest.repositories.UserRep;
 import com.daviipkp.lifedashboard.latest.services.TokenService;
@@ -17,9 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -43,7 +40,7 @@ public class AuthController {
         try {
             var userPass = new UsernamePasswordAuthenticationToken(loginCredentials.username(), loginCredentials.password());
             var auth = this.authenticationManager.authenticate(userPass);
-            UserData ud = (UserData) auth.getPrincipal();
+            UserAuthData ud = (UserAuthData) auth.getPrincipal();
 
             var token = tokenService.generateToken(ud);
             return ResponseEntity.ok(new AuthResponse(true
@@ -84,7 +81,7 @@ public class AuthController {
             }
             String encryptedPassword = passwordEncoder.encode(registerCredentials.password());
 
-            UserData newUser = new UserData(
+            UserAuthData newUser = new UserAuthData(
                     registerCredentials.email()
                     , registerCredentials.username()
                     , encryptedPassword
