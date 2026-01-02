@@ -3,12 +3,9 @@ package com.daviipkp.lifedashboard.controller;
 import com.daviipkp.lifedashboard.dto.DailyData;
 import com.daviipkp.lifedashboard.dto.DailyLogDTO;
 import com.daviipkp.lifedashboard.dto.Streaks;
-import com.daviipkp.lifedashboard.dto.UserConfig;
-import com.daviipkp.lifedashboard.repository.ConfigRepository;
 import com.daviipkp.lifedashboard.repository.DailyDataRepository;
-import com.daviipkp.lifedashboard.repository.GoalRepository;
 import com.daviipkp.lifedashboard.repository.StreaksRepository;
-import com.daviipkp.lifedashboard.service.LeetCodeService;
+import com.daviipkp.lifedashboard.latest.services.LeetCodeService;
 import com.daviipkp.lifedashboard.utils.DailyDataUtils;
 import com.daviipkp.lifedashboard.utils.Transforming;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,37 +29,6 @@ public class DashboardController {
     @Autowired
     private LeetCodeService leetCodeService;
 
-
-    @PostMapping("/log")
-    public DailyData createEntry(@RequestBody DailyLogDTO log) {
-        Integer solvedTodayLC = leetCodeService.getSolvedCount();
-        Integer solvedTodayDUO = 0;
-        DailyData data = getDataByDate(log.date());
-        if(data == null) {
-            data = new DailyData();
-        }
-        Streaks dto = streaksRepository.findById(0l).orElse(null);
-        List<Integer> l = dto.getStreaksValues();
-        if(dto != null) {
-            List<String> ss = dto.getStreaks();
-            for(String s : Transforming.checkChanges(log)) {
-                //add if conditionnnnnnnnnnnnnnn
-                    if(dto.getDate(s) == null) {
-                        dto.setDate(s, LocalDate.now());
-                        int num = l.get(ss.indexOf(s));
-                        l.set(ss.indexOf(s), 1);
-                    }
-                    if(ss.contains(s) && !Objects.equals(dto.getDate(s), LocalDate.now())) {
-                        int num = l.get(ss.indexOf(s));
-                        l.set(ss.indexOf(s), num + 1);
-                    }
-
-            }
-        }
-        dto.setStreaksValues(l);
-        streaksRepository.save(dto);
-        return repository.save(Transforming.incorporateDailyLog(log, data));
-    }
 
     @GetMapping("/by-date")
     public DailyData getData(
@@ -88,30 +54,6 @@ public class DashboardController {
     @GetMapping("/day-value")
     public Integer dayValue(@RequestParam LocalDate date) {
         return DailyDataUtils.dayValue(getDataByDate(date));
-    }
-
-    @GetMapping("/streaks")
-    public Streaks getStreaks(@RequestParam Long id) {
-        Streaks dto = streaksRepository.findById(id).orElse(null);
-        Integer solvedTodayLC = leetCodeService.getSolvedCount();
-        Integer solvedTodayDUO = 0;
-
-        List<String> l = new ArrayList<>();
-        List<Integer> l2 = new ArrayList<>();
-        if(dto == null) {
-            dto = getClearStreaks(id);
-            streaksRepository.save(dto);
-       }else{
-            for(String s : dto.getStreaks()) {
-                if(dto.getDate(s) != LocalDate.now() && dto.getDate(s) != LocalDate.now().minusDays(1)) {
-                    dto.setStreakValue(s, 0);
-                }
-            }
-        }
-        dto.addDuolingo(solvedTodayDUO);
-        dto.addLeetCode(solvedTodayLC);
-
-        return dto;
     }
 
     @GetMapping

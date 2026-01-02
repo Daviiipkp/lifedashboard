@@ -7,11 +7,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.http.ResponseEntity;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 @Entity
 @Table(name = "usercontentdata")
@@ -35,8 +37,8 @@ public class UserContentData {
                 "reading", "studying", "meals", "detox",
                 "planning", "leetCodeSolved", "duoSolved"
         );
-        for(int i = 0; i<5; i++) {
-            streaks.add(new Streak(defStreaks.get(i), (short)20, true));
+        for(int i = 0; i<12; i++) {
+            streaks.add(new Streak(defStreaks.get(i), (short)new Random().nextInt(0, 250), true));
         }
 
     }

@@ -49,7 +49,10 @@ public class SecurityConfigurations {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration c = new CorsConfiguration();
 
-        c.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+        c.setAllowedOriginPatterns(Arrays.asList(
+                "http://localhost:*",       // Aceita localhost em qualquer porta (3000, 8080, etc)
+                "http://192.168.0.9:*"      // Aceita app.meusite.com, admin.meusite.com
+        ));
 
         c.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         c.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
