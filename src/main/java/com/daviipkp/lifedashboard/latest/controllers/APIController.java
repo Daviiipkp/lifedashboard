@@ -2,10 +2,8 @@ package com.daviipkp.lifedashboard.latest.controllers;
 
 import com.daviipkp.lifedashboard.dto.DailyLogDTO;
 import com.daviipkp.lifedashboard.dto.Streaks;
-import com.daviipkp.lifedashboard.latest.dto.api.DailyData;
-import com.daviipkp.lifedashboard.latest.dto.api.Goal;
-import com.daviipkp.lifedashboard.latest.dto.api.RankingData;
-import com.daviipkp.lifedashboard.latest.dto.api.StreaksData;
+import com.daviipkp.lifedashboard.latest.dto.api.*;
+import com.daviipkp.lifedashboard.latest.instance.DailyLogData;
 import com.daviipkp.lifedashboard.latest.instance.UserAuthData;
 import com.daviipkp.lifedashboard.latest.instance.UserContentData;
 import com.daviipkp.lifedashboard.latest.repositories.ContentRep;
@@ -99,6 +97,38 @@ public class APIController {
             }
         }
         return null;
+    }
+
+    @GetMapping("/getlog")
+    public ResponseEntity<DailyLog> getLog(@AuthenticationPrincipal UserAuthData user, HttpServletRequest request) {
+        Integer solvedTodayLC = leetCodeService.getStreakCount(user.getUsername());
+        Integer solvedTodayDUO = duolingoService.getStreakCount(user.getUsername());
+        UserContentData data = contentRepository.getById(user.getContentID());
+        List<DailyLogData> logs = data.getLogs();
+        if(logs != null) {
+            for(DailyLogData log : logs) {
+                if(Objects.equals(log.getDate(), LocalDate.now())) {
+                    return ResponseEntity.ok().body(new DailyLog(log.getWakeUpTime(),
+                            log.getSleepTime(),
+                            log.isWorkedOut(),
+                            log.getMeals(),
+                            log.getWaterIntake(),
+                            log.isDetox(),
+                            log.getReading(),
+                            log.getStudying(),
+                            log.getFocusLevel()));
+                }
+            }
+        }
+        return ResponseEntity.ok().body(new DailyLog(0d,
+                0d,
+                false,
+                0,
+                0,
+                false,
+                0,
+                0,
+                (short) 0));
     }
 
 

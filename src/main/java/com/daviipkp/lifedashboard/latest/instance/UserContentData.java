@@ -1,5 +1,7 @@
 package com.daviipkp.lifedashboard.latest.instance;
 
+import com.daviipkp.lifedashboard.latest.dto.api.DailyData;
+import com.daviipkp.lifedashboard.latest.dto.api.DailyLog;
 import com.daviipkp.lifedashboard.latest.dto.api.StreakWidgetProps;
 import com.daviipkp.lifedashboard.latest.dto.api.StreaksData;
 import jakarta.persistence.*;
@@ -10,10 +12,8 @@ import lombok.Setter;
 import org.springframework.http.ResponseEntity;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.time.LocalDate;
+import java.util.*;
 
 @Entity
 @Table(name = "usercontentdata")
@@ -26,7 +26,9 @@ public class UserContentData {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long ID;
 
-    List<String> habitsDone = new ArrayList<>();
+    @ElementCollection
+    @CollectionTable(name = "daily_logs", joinColumns = @JoinColumn(name = "user_id"))
+    List<DailyLogData> logs = new ArrayList<>();
 
     @ElementCollection
     private List<Streak> streaks = new ArrayList<>();
