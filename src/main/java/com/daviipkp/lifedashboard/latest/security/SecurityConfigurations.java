@@ -63,7 +63,9 @@ public class SecurityConfigurations {
         CorsConfiguration c = new CorsConfiguration();
 
         c.setAllowedOriginPatterns(Arrays.asList(
-                "http://localhost:*"
+                "http://localhost:*",
+                "http://lifedashboard-frontend.vercel.app:*",
+                "https://lifedashboard-frontend.vercel.app:*"
         ));
 
         c.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
