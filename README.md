@@ -5,7 +5,7 @@ Life Dashboard - A "OS" for productivity
 
 **Backend:** Java (Spring Boot)
 
-**Frontend:** React
+**Frontend:** React (https://github.com/Daviiipkp/lifedashboard-frontend)
 
 **Database:** PostgreSQL/H2
 
