@@ -21,6 +21,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -61,15 +62,12 @@ public class SecurityConfigurations {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration c = new CorsConfiguration();
-
         c.setAllowedOriginPatterns(Arrays.asList(
-                "http://localhost:*",
-                "http://lifedashboard-frontend.vercel.app:*",
-                "https://lifedashboard-frontend.vercel.app:*"
+                "http://localhost:*"
         ));
-
+        c.setAllowedOrigins(List.of("https://lifedashboard-frontend.vercel.app"));
         c.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        c.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+        c.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
         c.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
