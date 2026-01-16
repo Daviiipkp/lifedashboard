@@ -8,5 +8,6 @@ public record DailyLog(Double wakeUpTime,
         Boolean detox,
         Integer reading,
         Integer studying,
-        Short focusLevel) {
+        Short focusLevel,
+        Integer working) {
 }

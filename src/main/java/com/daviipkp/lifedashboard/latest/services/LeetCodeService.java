@@ -19,7 +19,7 @@ public class LeetCodeService {
 
             HttpHeaders headers = new HttpHeaders();
             headers.add("Content-Type", "application/json");
-            headers.add("Referer", "https://leetcode.com/"); // O segredo está aqui
+            headers.add("Referer", "https://leetcode.com/");
             headers.add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
 
             String query = String.format("{ \"query\": \"{ matchedUser(username: \\\"%s\\\") { submitStats: submitStatsGlobal { acSubmissionNum { difficulty count } } } }\" }", username);

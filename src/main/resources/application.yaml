@@ -22,4 +22,4 @@ spring:
 api:
   security:
     token:
-      secret: ${API_SECURITY_TOKEN_SECRET}
+      secret: ${API_SECURITY_TOKEN_SECRET:my-local-dev-secret-123}

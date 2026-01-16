@@ -1,135 +1,102 @@
 package com.daviipkp.lifedashboard.latest.controllers;
 
-import com.daviipkp.lifedashboard.dto.DailyLogDTO;
-import com.daviipkp.lifedashboard.dto.Streaks;
 import com.daviipkp.lifedashboard.latest.dto.api.*;
-import com.daviipkp.lifedashboard.latest.instance.DailyLogData;
 import com.daviipkp.lifedashboard.latest.instance.UserAuthData;
-import com.daviipkp.lifedashboard.latest.instance.UserContentData;
-import com.daviipkp.lifedashboard.latest.repositories.ContentRep;
-import com.daviipkp.lifedashboard.latest.repositories.UserRep;
-import com.daviipkp.lifedashboard.latest.services.DuolingoService;
-import com.daviipkp.lifedashboard.latest.services.LeetCodeService;
-import com.daviipkp.lifedashboard.utils.Transforming;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.daviipkp.lifedashboard.latest.services.DashboardService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/api")
 public class APIController {
 
-    @Autowired
-    private ContentRep contentRepository;
+    private final DashboardService dashboardService;
 
-    @Autowired
-    private UserRep userRepository;
-    @Autowired
-    private LeetCodeService leetCodeService;
-
-    @Autowired
-    private DuolingoService duolingoService;
+    public APIController(DashboardService dashboardService) {
+        this.dashboardService = dashboardService;
+    }
 
     @GetMapping("/streaksdata")
-    public StreaksData getStreakData(@AuthenticationPrincipal UserAuthData user, HttpServletRequest request){
-        if(user == null || !user.isEnabled()) {
-            return null;
+    public ResponseEntity<StreaksData> getStreakData(@AuthenticationPrincipal UserAuthData user) {
+        if (user == null || !user.isEnabled()) {
+            return ResponseEntity.status(401).build();
         }
-        UserContentData data = contentRepository.findByID(user.getContentID()).orElse(null);
-        if(data != null) {
-            data = new UserContentData();
-            contentRepository.save(data);
-            user.setContentID(data.getID());
-            userRepository.save(user);
-        }
-        return data.getStreaksData();
+        return ResponseEntity.ok(dashboardService.getStreakData(user));
+    }
+
+    @PostMapping("/saveplanning")
+    public ResponseEntity<Void> savePlanning(@AuthenticationPrincipal UserAuthData user,
+                                             @RequestBody Map<String, String> payload) {
+        dashboardService.savePlanning(user, payload.get("planning"));
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/savelog")
+    public ResponseEntity<StreaksData> saveLog(@AuthenticationPrincipal UserAuthData user,
+                                               @RequestBody DailyLog log) {
+        return ResponseEntity.ok(dashboardService.saveDailyLog(user, log));
+    }
+
+    @PostMapping("/updategoals")
+    public ResponseEntity<Void> updateGoals(@AuthenticationPrincipal UserAuthData user,
+                                               @RequestBody Goal[] goals) {
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/dailydata")
+    public ResponseEntity<DailyData> getDailyData(@AuthenticationPrincipal UserAuthData user) {
+        return ResponseEntity.ok(dashboardService.getDailyDataFormatted(user));
+    }
+
+    @GetMapping("/getlog")
+    public ResponseEntity<DailyLog> getLog(@AuthenticationPrincipal UserAuthData user) {
+        return ResponseEntity.ok(dashboardService.getLogDto(user));
+    }
+
+    @GetMapping("/pertinentdata")
+    public ResponseEntity<PertinentData> getPertinentData(@AuthenticationPrincipal UserAuthData user) {
+        return ResponseEntity.ok(dashboardService.getPertinentData(user));
+    }
+
+    @GetMapping("/habitscfg")
+    public ResponseEntity<HabitsConfig> getHabitsConfig(@AuthenticationPrincipal UserAuthData user) throws IllegalAccessException {
+        var content = dashboardService.getOrCreateContent(user);
+        return ResponseEntity.ok(content.getHabitsConfigDTO());
     }
 
     @GetMapping("/goals")
     public List<Goal> getGoals() {
-        return null;
+        return Collections.emptyList();
     }
 
-    @GetMapping("/dailytoughts")
+    @GetMapping("/dailythoughts")
     public String getDailyThoughts(LocalDate date) {
-        return null;
+        return "";
     }
 
     @GetMapping("/dailyobservations")
     public List<String> getDailyObservations(LocalDate date) {
-        return null;
+        return Collections.emptyList();
     }
 
     @GetMapping("/calendar")
     public List<DailyData> getCalendar(LocalDate month) {
-        //Don't forget that you must get it by saving the first month that is registered in database and using a sequential ID for the other months.
-        //Ex: Logged in January 1st so that's month 1. February would be month 2. No need to save dates on database, just sequence.
-        return null;
+        return Collections.emptyList();
     }
 
     @GetMapping("/dailyinsight")
     public String getDailyInsight() {
-        return null;
+        return "";
     }
 
     @GetMapping("/ranking")
     public Map<String, RankingData> getRanking() {
-        return null;
+        return Collections.emptyMap();
     }
-
-    @PostMapping("/log")
-    public ResponseEntity<Object> createEntry(@AuthenticationPrincipal UserAuthData user, @RequestBody DailyLogDTO log) {
-        Integer solvedTodayLC = leetCodeService.getStreakCount(user.getUsername());
-        Integer solvedTodayDUO = duolingoService.getStreakCount(user.getUsername());
-        UserContentData data = contentRepository.getById(user.getContentID());
-        StreaksData strData = data.getStreaksData();
-        if(strData.streaks() != null) {
-            for(String s : Transforming.checkChanges(log)) {
-
-
-            }
-        }
-        return null;
-    }
-
-    @GetMapping("/getlog")
-    public ResponseEntity<DailyLog> getLog(@AuthenticationPrincipal UserAuthData user, HttpServletRequest request) {
-        Integer solvedTodayLC = leetCodeService.getStreakCount(user.getUsername());
-        Integer solvedTodayDUO = duolingoService.getStreakCount(user.getUsername());
-        UserContentData data = contentRepository.getById(user.getContentID());
-        List<DailyLogData> logs = data.getLogs();
-        if(logs != null) {
-            for(DailyLogData log : logs) {
-                if(Objects.equals(log.getDate(), LocalDate.now())) {
-                    return ResponseEntity.ok().body(new DailyLog(log.getWakeUpTime(),
-                            log.getSleepTime(),
-                            log.isWorkedOut(),
-                            log.getMeals(),
-                            log.getWaterIntake(),
-                            log.isDetox(),
-                            log.getReading(),
-                            log.getStudying(),
-                            log.getFocusLevel()));
-                }
-            }
-        }
-        return ResponseEntity.ok().body(new DailyLog(0d,
-                0d,
-                false,
-                0,
-                0,
-                false,
-                0,
-                0,
-                (short) 0));
-    }
-
-
 }

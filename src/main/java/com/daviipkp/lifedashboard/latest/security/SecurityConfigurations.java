@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -31,7 +32,7 @@ public class SecurityConfigurations {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, CorsConfigurationSource corsConfigurationSource) throws Exception {
         return httpSecurity
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
@@ -39,6 +40,18 @@ public class SecurityConfigurations {
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/verify").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/streaksdata").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/saveplanning").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/ranking").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/dailyinsight").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/calendar").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/dailyobservations").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/dailythoughts").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/goals").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/savelog").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/dailydata").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/habitscfg").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/pertinentdata").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/getlog").permitAll()
                         .anyRequest().authenticated()
                 )
                  .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
@@ -50,13 +63,12 @@ public class SecurityConfigurations {
         CorsConfiguration c = new CorsConfiguration();
 
         c.setAllowedOriginPatterns(Arrays.asList(
-                "http://localhost:*",       // Aceita localhost em qualquer porta (3000, 8080, etc)
-                "http://192.168.0.9:*"      // Aceita app.meusite.com, admin.meusite.com
+                "http://localhost:*"
         ));
 
         c.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         c.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
-        c.setAllowCredentials(true); // Importante se você usar Cookies ou Auth Headers
+        c.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", c);
@@ -68,14 +80,11 @@ public class SecurityConfigurations {
                                                        PasswordEncoder passwordEncoder,
                                                        UserDetailsService userDetailsService) throws Exception {
 
-        // 1. Recupera o Builder compartilhado do HttpSecurity
         var authBuilder = http.getSharedObject(org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder.class);
 
-        // 2. Configura o Service e o Encoder de forma direta (sem .and())
         authBuilder.userDetailsService(userDetailsService)
                 .passwordEncoder(passwordEncoder);
 
-        // 3. Constrói o manager
         return authBuilder.build();
     }
 
