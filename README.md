@@ -4,6 +4,9 @@ Life Dashboard - A "OS" for productivity
 
 
 **Backend:** Java (Spring Boot)
+
 **Frontend:** React
+
 **Database:** PostgreSQL/H2
+
 **Security:** REST API
