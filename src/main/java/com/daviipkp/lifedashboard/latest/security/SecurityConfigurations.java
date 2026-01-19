@@ -53,6 +53,7 @@ public class SecurityConfigurations {
                         .requestMatchers(HttpMethod.GET, "/api/habitscfg").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/pertinentdata").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/getlog").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/health").permitAll()
                         .anyRequest().authenticated()
                 )
                  .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
