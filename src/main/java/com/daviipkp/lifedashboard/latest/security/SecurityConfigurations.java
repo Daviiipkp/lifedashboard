@@ -62,17 +62,25 @@ public class SecurityConfigurations {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration c = new CorsConfiguration();
-        c.setAllowedOriginPatterns(Arrays.asList(
-                "http://localhost:*"
-        ));
-        c.setAllowedOrigins(List.of("https://lifedashboard-frontend.vercel.app"));
-        c.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        c.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
-        c.setAllowCredentials(true);
+        CorsConfiguration strictConfig = new CorsConfiguration();
+        strictConfig.setAllowedOriginPatterns(Arrays.asList("http://localhost:*"));
+        strictConfig.setAllowedOrigins(List.of("https://lifedashboard-frontend.vercel.app"));
+        strictConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        strictConfig.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
+        strictConfig.setAllowCredentials(true);
+
+        CorsConfiguration openConfig = new CorsConfiguration();
+        openConfig.setAllowedOriginPatterns(List.of("*"));
+        openConfig.setAllowedMethods(List.of("GET"));
+        openConfig.setAllowedHeaders(List.of("*"));
+        openConfig.setAllowCredentials(false);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", c);
+
+        source.registerCorsConfiguration("/api/health", openConfig);
+
+        source.registerCorsConfiguration("/**", strictConfig);
+
         return source;
     }
 
