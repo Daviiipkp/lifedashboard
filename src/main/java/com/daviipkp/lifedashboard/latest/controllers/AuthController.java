@@ -11,13 +11,18 @@ import com.daviipkp.lifedashboard.latest.repositories.UserRep;
 import com.daviipkp.lifedashboard.latest.services.TokenService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/auth")
@@ -72,13 +77,24 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Object> register(@RequestBody @Valid RegisterCredentials registerCredentials) {
-        try{
+    public ResponseEntity<Object> register(@RequestBody @Valid RegisterCredentials registerCredentials,
+                                           BindingResult bindingResult) {
+        try {
+            if (bindingResult.hasErrors()) {
+                String errorMsg = bindingResult.getAllErrors().stream()
+                        .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                        .collect(Collectors.joining(", "));
+
+                return ResponseEntity
+                        .status(HttpStatus.BAD_REQUEST)
+                        .body(new ServerResponse("Validation error: " + errorMsg, 400, ResponseType.ERROR));
+            }
             if(this.userRepository.findByUsername(registerCredentials.username()).isPresent()) {
                 throw new DataIntegrityViolationException("username");
-            }else if(this.userRepository.findByEmail(registerCredentials.email()).isPresent()) {
+            } else if(this.userRepository.findByEmail(registerCredentials.email()).isPresent()) {
                 throw new DataIntegrityViolationException("e-mail");
             }
+
             String encryptedPassword = passwordEncoder.encode(registerCredentials.password());
 
             UserAuthData newUser = new UserAuthData(
@@ -89,15 +105,24 @@ public class AuthController {
 
             userRepository.save(newUser);
             return ResponseEntity.ok().build();
-        }
-        catch (DataIntegrityViolationException e) {
+
+        } catch (DataIntegrityViolationException e) {
+            String target = e.getMessage().contains("username") ? "username" : "e-mail";
             return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(new ServerResponse("There's already an account with this " + e.getMessage() , 409, ResponseType.ERROR));
+                    .status(HttpStatus.CONFLICT)
+                    .body(new ServerResponse("An account with this " + target + " already exists.", 409, ResponseType.ERROR));
+
+        } catch (HttpMessageNotReadableException e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ServerResponse("Invalid JSON format or missing request body.", 400, ResponseType.ERROR));
+
         } catch (Exception e) {
+            e.printStackTrace();
+
             return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(new ServerResponse("Error. Contact support." , 500, ResponseType.ERROR));
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ServerResponse("Internal Server Error. Please contact support.", 500, ResponseType.ERROR));
         }
     }
 }

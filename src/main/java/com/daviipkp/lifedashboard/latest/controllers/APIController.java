@@ -22,6 +22,11 @@ public class APIController {
         this.dashboardService = dashboardService;
     }
 
+    @GetMapping("/health")
+    public String health() {
+        return "ALIVE";
+    }
+
     @GetMapping("/streaksdata")
     public ResponseEntity<StreaksData> getStreakData(@AuthenticationPrincipal UserAuthData user) {
         if (user == null || !user.isEnabled()) {
