@@ -63,8 +63,8 @@ public class SecurityConfigurations {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration strictConfig = new CorsConfiguration();
-        strictConfig.setAllowedOriginPatterns(Arrays.asList("http://localhost:*"));
-        strictConfig.setAllowedOrigins(List.of("https://lifedashboard-frontend.vercel.app"));
+        strictConfig.setAllowedOriginPatterns(List.of("http://localhost:*"));
+        strictConfig.setAllowedOrigins(List.of("https://aequo.daviipkp.org"));
         strictConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         strictConfig.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
         strictConfig.setAllowCredentials(true);
