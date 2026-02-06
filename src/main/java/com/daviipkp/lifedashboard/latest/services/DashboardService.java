@@ -27,6 +27,8 @@ public class DashboardService {
         this.duolingoService = duolingoService;
     }
 
+
+
     @Transactional
     public UserContentData getOrCreateContent(UserAuthData user) {
         return contentRepository.findById(user.getContentID())
@@ -43,8 +45,18 @@ public class DashboardService {
         StreakWidgetProps[] s = getOrCreateContent(user).getStreaksData().streaks();
         contentRepository.save(getOrCreateContent(user));
         StreakWidgetProps[] t = Arrays.copyOf(s, s.length + 2, StreakWidgetProps[].class);
-        t[s.length] = new StreakWidgetProps("leetCodeSolved", (short)((int)leetCodeService.getStreakCount(user.getUsername())), false);
-        t[s.length + 1] = new StreakWidgetProps("duoSolved", (short)((int)duolingoService.getStreakCount(user.getUsername())), duolingoService.getUserStats(user.getUsername()).practicedToday());
+        t[s.length] = new StreakWidgetProps(
+                "LeetCode",
+                (short)((int)leetCodeService.getStreakCount(user.getUsername())),
+                false,
+                StreakColors.create("blue", "300", "500/60", "500", "lg", "950/50")
+        );
+
+        t[s.length + 1] = new StreakWidgetProps("Duolingo",
+                (short)((int)duolingoService.getStreakCount(user.getUsername())),
+                duolingoService.getUserStats(user.getUsername()).practicedToday(),
+                StreakColors.create("green", "300", "300/60", "600", "lg", "950/50")
+        );
         return new StreaksData(t);
     }
 
@@ -118,15 +130,15 @@ public class DashboardService {
                                                         int lcCount) {
 
         return Arrays.stream(streaks).map(streak -> {
-            String type = streak.type() != null ? streak.type().toLowerCase() : "";
+            String type = streak.type() != null ? streak.type() : "";
 
-            if (type.equals("duolingo")) {
-                return new StreakWidgetProps(streak.type(), (short) duoStats.streak(), duoStats.practicedToday());
+            if (type.equals("Duolingo")) {
+                return new StreakWidgetProps(streak.type(), (short) duoStats.streak(), duoStats.practicedToday(), streak.currentTheme());
             }
 
-            if (type.equals("leetcode")) {
+            if (type.equals("Leetcode")) {
                 boolean solvedToday = lcCount > 0;
-                return new StreakWidgetProps(streak.type(), (short) lcCount, solvedToday);
+                return new StreakWidgetProps(streak.type(), (short) lcCount, solvedToday, streak.currentTheme());
             }
 
 
@@ -149,7 +161,7 @@ public class DashboardService {
                 newCount++;
             }
 
-            return new StreakWidgetProps(streak.type(), newCount, isCompletedToday);
+            return new StreakWidgetProps(streak.type(), newCount, isCompletedToday, streak.currentTheme());
         }).toArray(StreakWidgetProps[]::new);
     }
 

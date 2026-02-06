@@ -104,7 +104,11 @@ public class AuthController {
                     , UserRole.ADMIN, false);
 
             userRepository.save(newUser);
-            return ResponseEntity.ok().build();
+            var token = tokenService.generateToken(newUser);
+            return ResponseEntity.ok(new AuthResponse(true
+                    , ""
+                    , newUser
+                    , token));
 
         } catch (DataIntegrityViolationException e) {
             String target = e.getMessage().contains("username") ? "username" : "e-mail";

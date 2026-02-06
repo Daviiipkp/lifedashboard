@@ -1,14 +1,12 @@
 package com.daviipkp.lifedashboard.latest.instance;
 
 import com.daviipkp.lifedashboard.latest.dto.api.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.http.ResponseEntity;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.util.*;
@@ -39,14 +37,65 @@ public class UserContentData {
     @ElementCollection
     private List<Streak> streaks = new ArrayList<>();
 
+    @JsonIgnore
+    @Transient
+    private List<StreakWidgetProps> defaultStreaks = new ArrayList<>();
+
     public UserContentData() {
-        List<String> defStreaks = List.of(
-                "sleep", "wakeUpTime", "workedOut", "focus", "water",
-                "reading", "studying", "meals", "detox",
-                "planning"
-        );
-        for(int i = 0; i<defStreaks.size(); i++) {
-            streaks.add(new Streak(defStreaks.get(i), (short)0, false));
+
+        defaultStreaks.add(new StreakWidgetProps("Sleep",
+                (short)0,
+                false,
+                StreakColors.create("blue", "300", "500/60", "500", "lg", "950/50")
+        ));
+        defaultStreaks.add(new StreakWidgetProps("Wake up Time",
+                (short)0,
+                false,
+                StreakColors.create("blue", "300", "500/60", "500", "lg", "950/50")
+        ));
+        defaultStreaks.add(new StreakWidgetProps("Worked Out",
+                (short)0,
+                false,
+                StreakColors.create("blue", "300", "500/60", "500", "lg", "950/50")
+        ));
+        defaultStreaks.add(new StreakWidgetProps("Focus",
+                (short)0,
+                false,
+                StreakColors.create("blue", "300", "500/60", "500", "lg", "950/50")
+        ));
+        defaultStreaks.add(new StreakWidgetProps("Water Intake",
+                (short)0,
+                false,
+                StreakColors.create("blue", "300", "500/60", "500", "lg", "950/50")
+        ));
+        defaultStreaks.add(new StreakWidgetProps("Reading",
+                (short)0,
+                false,
+                StreakColors.create("blue", "300", "500/60", "500", "lg", "950/50")
+        ));
+        defaultStreaks.add(new StreakWidgetProps("Studying",
+                (short)0,
+                false,
+                StreakColors.create("blue", "300", "500/60", "500", "lg", "950/50")
+        ));
+        defaultStreaks.add(new StreakWidgetProps("Meal count",
+                (short)0,
+                false,
+                StreakColors.create("blue", "300", "500/60", "500", "lg", "950/50")
+        ));
+        defaultStreaks.add(new StreakWidgetProps("Detox",
+                (short)0,
+                false,
+                StreakColors.create("blue", "300", "500/60", "500", "lg", "950/50")
+        ));
+        defaultStreaks.add(new StreakWidgetProps("Planning",
+                (short)0,
+                false,
+                StreakColors.create("blue", "300", "500/60", "500", "lg", "950/50")
+        ));
+
+        for(int i = 0; i<defaultStreaks.size(); i++) {
+            streaks.add(new Streak(defaultStreaks.get(i).type(), (short)0, false));
         }
         for(Field f : HabitsConfig.class.getDeclaredFields()) {
             hbConfig.put(f.getName(), 0l);
@@ -67,45 +116,24 @@ public class UserContentData {
     }
 
     public StreaksData getStreaksData() {
-
-        List<String> defStreaks = new ArrayList<>(List.of(
-                "sleep", "wakeUpTime", "workedOut", "focus", "water",
-                "reading", "studying", "meals", "detox",
-                "planning"
-        ));
-
-
-        StreakWidgetProps[] props = new StreakWidgetProps[streaks.size()];
+        StreakWidgetProps[] props = new StreakWidgetProps[defaultStreaks.size()];
         if(!Objects.equals(lastStreaksUpdate, LocalDate.now())) {
-            for(Streak s : streaks) {
-                defStreaks.remove(s.name);
-                props[streaks.indexOf(s)] = new StreakWidgetProps(s.getName(), s.getCount(), false);
+
+            for(StreakWidgetProps s : defaultStreaks) {
+                Streak str = getStreakByName(s.type());
+                streaks.remove(str);
+                str.doneToday = false;
+                streaks.add(str);
+                props[defaultStreaks.indexOf(s)] = new StreakWidgetProps(s.type(), str.getCount(), false, s.currentTheme());
             }
             lastStreaksUpdate = LocalDate.now();
         }else{
-            for(Streak s : streaks) {
-                defStreaks.remove(s.name);
-                props[streaks.indexOf(s)] = new StreakWidgetProps(s.getName(), s.getCount(), s.doneToday);
+            for(StreakWidgetProps s : defaultStreaks) {
+                Streak str = getStreakByName(s.type());
+                props[defaultStreaks.indexOf(s)] = new StreakWidgetProps(s.type(), str.getCount(), str.doneToday, s.currentTheme());
             }
         }
-
-        StreakWidgetProps[] props2 = new StreakWidgetProps[defStreaks.size()];
-        for(String s : defStreaks) {
-            props2[defStreaks.indexOf(s)] =  new StreakWidgetProps(s, (short)0, false);
-        }
-        return new StreaksData(concatenate(props, props2));
-    }
-
-    public <T> T[] concatenate(T[] a, T[] b) {
-        int aLen = a.length;
-        int bLen = b.length;
-
-        @SuppressWarnings("unchecked")
-        T[] c = (T[]) Array.newInstance(a.getClass().getComponentType(), aLen + bLen);
-        System.arraycopy(a, 0, c, 0, aLen);
-        System.arraycopy(b, 0, c, aLen, bLen);
-
-        return c;
+        return new StreaksData(props);
     }
 
     public DailyLogData getLogByDate(LocalDate arg0) {
@@ -117,6 +145,15 @@ public class UserContentData {
         DailyLogData d = new DailyLogData();
         replaceLogData(d);
         return d;
+    }
+
+    public Streak getStreakByName(String arg0) {
+        for(Streak s: streaks) {
+            if(s.getName().equalsIgnoreCase(arg0)) {
+                return s;
+            }
+        }
+        return null;
     }
 
     public DailyLogData getLogAndRemoveByDate(LocalDate arg0) {
