@@ -11,5 +11,4 @@ import java.util.UUID;
 @Component
 public interface ContentRep extends JpaRepository<UserContentData, Long> {
     Optional<UserContentData> findByID(Long ID);
-    Optional<UserContentData> allUserContentData();
 }
