@@ -2,6 +2,9 @@ package com.daviipkp.lifedashboard.latest.controllers;
 
 import com.daviipkp.lifedashboard.latest.dto.api.*;
 import com.daviipkp.lifedashboard.latest.instance.UserAuthData;
+import com.daviipkp.lifedashboard.latest.instance.UserContentData;
+import com.daviipkp.lifedashboard.latest.repositories.ContentRep;
+import com.daviipkp.lifedashboard.latest.repositories.UserRep;
 import com.daviipkp.lifedashboard.latest.services.DashboardService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,14 +20,21 @@ import java.util.Map;
 public class APIController {
 
     private final DashboardService dashboardService;
+    private final UserRep contentRep;
 
-    public APIController(DashboardService dashboardService) {
+    public APIController(DashboardService dashboardService, UserRep arg1) {
+        this.contentRep = arg1;
         this.dashboardService = dashboardService;
     }
 
     @GetMapping("/health")
     public String health() {
-        return "ALIVE";
+        StringBuilder b = new StringBuilder();
+        for(UserAuthData c : contentRep.findAll()) {
+            b.append(c.getUsername());
+            b.append("\n");
+        }
+        return b.toString();
     }
 
     @GetMapping("/streaksdata")
